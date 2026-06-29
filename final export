@@ -1,0 +1,44 @@
+import sys
+import clr
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+
+
+dataEnteringNode = IN
+
+clr.AddReference('RevitAPI')
+from Autodesk.Revit.DB import *
+
+clr.AddReference('System')
+from System.Collections.Generic import List
+
+clr.AddReference('RevitNodes')
+import Revit
+clr.ImportExtensions(Revit.Elements)
+
+clr.AddReference('RevitServices')
+import RevitServices
+from RevitServices.Persistence import DocumentManager
+
+doc = DocumentManager.Instance.CurrentDBDocument
+
+Sheets = UnwrapElement(IN[0])
+Names = IN[1]
+Folder = IN[2]
+result = []
+sheets = List[ElementId]()
+
+DWGopts = DWGExportOptions()
+
+#merge views in dwg into one file
+DWGopts.MergedViews = True
+
+
+for sheet,name in zip(Sheets,Names):
+    DWGopts.FileName = name
+    Sheet = List[ElementId]()
+    Sheet.Add(sheet.Id)
+    result.append(doc.Export(Folder, name ,Sheet, DWGopts))   
+    
+OUT = result
+
